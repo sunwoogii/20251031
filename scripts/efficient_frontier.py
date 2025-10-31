@@ -10,7 +10,7 @@ from typing import Dict, Iterable, List, Sequence, Tuple
 
 
 ###############################################################################
-# Data loading utilities
+# 데이터 적재 유틸리티
 ###############################################################################
 
 
@@ -25,7 +25,7 @@ class ReturnSeries:
 
 
 def load_close_returns(csv_path: Path) -> List[ReturnSeries]:
-    """Load daily close-to-close returns for every ticker in the CSV."""
+    """CSV에 포함된 모든 티커의 일간 종가 기준 수익률을 불러옵니다."""
 
     with csv_path.open() as f:
         reader = csv.reader(f)
@@ -67,13 +67,13 @@ def load_close_returns(csv_path: Path) -> List[ReturnSeries]:
 
 
 ###############################################################################
-# Linear algebra helpers
+# 선형대수 보조 함수
 ###############################################################################
 
 
 def align_returns(series_list: Sequence[ReturnSeries]) -> Tuple[List[datetime], List[List[float]]]:
     if not series_list:
-        raise ValueError("No return series provided")
+        raise ValueError("수익률 시퀀스가 제공되지 않았습니다")
 
     common_dates = set(series_list[0].dates)
     for series in series_list[1:]:
@@ -81,7 +81,7 @@ def align_returns(series_list: Sequence[ReturnSeries]) -> Tuple[List[datetime], 
 
     aligned_dates = sorted(common_dates)
     if not aligned_dates:
-        raise ValueError("No overlapping dates among the assets")
+        raise ValueError("자산 간에 공통 거래일이 존재하지 않습니다")
 
     lookup = {series.ticker: series.to_dict() for series in series_list}
     matrix = [
@@ -94,16 +94,16 @@ def align_returns(series_list: Sequence[ReturnSeries]) -> Tuple[List[datetime], 
 def mean(values: Iterable[float]) -> float:
     values = list(values)
     if not values:
-        raise ValueError("Cannot compute mean of empty sequence")
+        raise ValueError("빈 시퀀스의 평균을 계산할 수 없습니다")
     return sum(values) / len(values)
 
 
 def covariance(x: List[float], y: List[float]) -> float:
     if len(x) != len(y):
-        raise ValueError("Series length mismatch")
+        raise ValueError("시퀀스 길이가 일치하지 않습니다")
     n = len(x)
     if n < 2:
-        raise ValueError("At least two observations required for covariance")
+        raise ValueError("공분산 계산에는 최소 두 개 이상의 관측치가 필요합니다")
     avg_x = mean(x)
     avg_y = mean(y)
     return sum((xi - avg_x) * (yi - avg_y) for xi, yi in zip(x, y)) / (n - 1)
@@ -138,7 +138,7 @@ def invert(matrix: List[List[float]]) -> List[List[float]]:
                 pivot = row
                 pivot_abs = val
         if pivot is None:
-            raise ValueError("Matrix is singular")
+            raise ValueError("행렬이 특이행렬입니다")
         if pivot != col:
             aug[col], aug[pivot] = aug[pivot], aug[col]
 
@@ -156,7 +156,7 @@ def invert(matrix: List[List[float]]) -> List[List[float]]:
 
 
 ###############################################################################
-# Efficient frontier calculations
+# 효율적 투자선 계산
 ###############################################################################
 
 
@@ -210,7 +210,7 @@ class EfficientFrontier:
 
         det = a * c - b * b
         if abs(det) <= 1e-16:
-            raise ValueError("Ill-conditioned covariance matrix")
+            raise ValueError("공분산 행렬의 조건수가 매우 나빠 최적화를 진행할 수 없습니다")
 
         lambda1 = (c * target_return - b) / det
         lambda2 = (a - b * target_return) / det
@@ -240,14 +240,14 @@ class EfficientFrontier:
         inv_cov_excess = matvec(self.inv_cov, excess)
         denom = vecdot([1.0] * len(self.mean_returns), inv_cov_excess)
         if abs(denom) <= 1e-16:
-            raise ValueError("Cannot compute tangency portfolio")
+            raise ValueError("접선 포트폴리오를 계산할 수 없습니다")
         weights = [value / denom for value in inv_cov_excess]
         exp_return, volatility = self.portfolio_stats(weights)
         return FrontierPoint(exp_return, volatility, weights)
 
 
 ###############################################################################
-# SVG rendering
+# SVG 렌더링
 ###############################################################################
 
 
@@ -294,18 +294,18 @@ def make_svg(
     tangency_circle = (
         f'<circle cx="{scale_x(tangency.volatility):.2f}" cy="{scale_y(tangency.expected_return):.2f}" '
         f'r="6" fill="#d62728" />'
-        f"<text x='{scale_x(tangency.volatility) + 10:.2f}' y='{scale_y(tangency.expected_return) + 4:.2f}' font-size='14'>Max Sharpe</text>"
+        f"<text x='{scale_x(tangency.volatility) + 10:.2f}' y='{scale_y(tangency.expected_return) + 4:.2f}' font-size='14'>최대 샤프</text>"
     )
 
     annotations = []
     annotations.append(
-        f"<text x='{padding}' y='{padding - 20}' font-size='18' font-weight='bold'>Efficient Frontier</text>"
+        f"<text x='{padding}' y='{padding - 20}' font-size='18' font-weight='bold'>효율적 투자선</text>"
     )
     annotations.append(
-        f"<text x='{padding}' y='{height - padding + 40}' font-size='12'>Risk-free rate: {format_percentage(stats.risk_free_rate)}</text>"
+        f"<text x='{padding}' y='{height - padding + 40}' font-size='12'>무위험 수익률: {format_percentage(stats.risk_free_rate)}</text>"
     )
     annotations.append(
-        f"<text x='{padding}' y='{height - padding + 60}' font-size='12'>Annualisation: {stats.trading_days} trading days</text>"
+        f"<text x='{padding}' y='{height - padding + 60}' font-size='12'>연환산 기준: 거래일 {stats.trading_days}일</text>"
     )
 
     for idx, (ticker, mean_return, vol) in enumerate(
@@ -313,7 +313,7 @@ def make_svg(
     ):
         y = padding + idx * 20
         annotations.append(
-            f"<text x='{width - padding - 220}' y='{y + 20}' font-size='12'>{ticker}: {format_percentage(mean_return)} / {format_percentage(vol)}</text>"
+            f"<text x='{width - padding - 220}' y='{y + 20}' font-size='12'>{ticker}: 기대수익 {format_percentage(mean_return)} / 변동성 {format_percentage(vol)}</text>"
         )
 
     svg = f"""
@@ -327,44 +327,44 @@ def make_svg(
   {''.join(annotations)}
 </svg>
 """.strip()
-    return svg
+    return svg + "\n"
 
 
 ###############################################################################
-# CLI interface
+# CLI 인터페이스
 ###############################################################################
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Efficient frontier analysis for temp.csv")
-    parser.add_argument("--csv", type=Path, default=Path("temp.csv"), help="Input CSV file")
-    parser.add_argument("--output", type=Path, default=Path("assets/efficient_frontier.svg"), help="Output SVG path")
+    parser = argparse.ArgumentParser(description="temp.csv 데이터를 이용해 효율적 투자선을 계산합니다")
+    parser.add_argument("--csv", type=Path, default=Path("temp.csv"), help="입력 CSV 파일 경로")
+    parser.add_argument("--output", type=Path, default=Path("assets/efficient_frontier.svg"), help="SVG 결과 저장 경로")
     parser.add_argument(
         "--risk-free",
         type=float,
         default=0.0,
-        help="Annualized risk-free rate expressed as a decimal (e.g. 0.03)",
+        help="연환산 무위험 수익률(예: 0.03)",
     )
     parser.add_argument(
         "--steps",
         type=int,
         default=50,
-        help="Number of samples along the efficient frontier",
+        help="효율적 투자선에서 계산할 포인트 개수",
     )
     parser.add_argument(
         "--trading-days",
         type=int,
         default=252,
-        help="Number of observations per year used for annualisation",
+        help="연환산에 사용할 연간 거래일 수",
     )
     return parser.parse_args()
 
 
 def run(args: argparse.Namespace) -> EfficientFrontierResult:
     if args.steps < 2:
-        raise ValueError("--steps must be at least 2 to form a frontier")
+        raise ValueError("효율적 투자선을 구성하려면 --steps 값이 2 이상이어야 합니다")
     if args.trading_days <= 0:
-        raise ValueError("--trading-days must be positive")
+        raise ValueError("--trading-days 값은 양수여야 합니다")
 
     series = load_close_returns(args.csv)
     tickers = [series_item.ticker for series_item in series]
@@ -404,27 +404,27 @@ def main() -> None:
     args = parse_args()
     result = run(args)
 
-    print(f"Aligned observations: {result.observations}")
-    print(f"Frontier resolution: {len(result.frontier)} points")
-    print(f"Annualisation factor: {result.trading_days} trading days")
-    print("Annualized mean returns (%):")
+    print(f"정렬된 관측치 수: {result.observations}")
+    print(f"효율적 투자선 분해능: {len(result.frontier)} 포인트")
+    print(f"연환산 기준 거래일: {result.trading_days}일")
+    print("연환산 기대수익률(%):")
     for ticker, mean_return in zip(result.tickers, result.mean_returns):
         print(f"  {ticker}: {mean_return * 100:.2f}")
-    print("Annualized volatility (%):")
+    print("연환산 변동성(%):")
     for ticker, vol in zip(result.tickers, result.volatilities):
         print(f"  {ticker}: {vol * 100:.2f}")
 
     tangency = result.tangency
-    print("\nMax Sharpe (tangency) portfolio weights:")
+    print("\n최대 샤프(접선) 포트폴리오 비중:")
     for ticker, weight in zip(result.tickers, tangency.weights):
         print(f"  {ticker}: {weight * 100:.2f}%")
     print(
-        f"Expected return: {tangency.expected_return * 100:.2f}% | Volatility: {tangency.volatility * 100:.2f}%"
+        f"기대수익률: {tangency.expected_return * 100:.2f}% | 변동성: {tangency.volatility * 100:.2f}%"
     )
 
     svg = make_svg(result.tickers, result)
     save_svg(svg, args.output)
-    print(f"SVG chart saved to {args.output}")
+    print(f"SVG 차트를 {args.output}에 저장했습니다")
 
 
 if __name__ == "__main__":

@@ -13,8 +13,8 @@ def stats(values):
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Summarise temp.csv time series metrics")
-    parser.add_argument("--csv", type=Path, default=Path("temp.csv"), help="Input CSV path")
+    parser = argparse.ArgumentParser(description="temp.csv 시계열 지표를 요약합니다")
+    parser.add_argument("--csv", type=Path, default=Path("temp.csv"), help="입력 CSV 경로")
     return parser.parse_args()
 
 
@@ -57,22 +57,22 @@ def main():
         volume_avg, volume_std = stats(volume_vals)
         return_avg, return_std = stats(returns)
 
-        print(f"{ticker} | {len(close_vals)} days | {closes[0][0]} - {closes[-1][0]}")
+        print(f"{ticker} | 관측일수 {len(close_vals)}일 | {closes[0][0]} ~ {closes[-1][0]}")
         print(
-            "  Close: "
-            f"last={close_vals[-1]:.2f}, "
-            f"mean={close_avg:.2f}±{close_std:.2f}, "
-            f"min={min(close_vals):.2f}, max={max(close_vals):.2f}"
+            "  종가: "
+            f"최신={close_vals[-1]:.2f}, "
+            f"평균={close_avg:.2f}±{close_std:.2f}, "
+            f"최저={min(close_vals):.2f}, 최고={max(close_vals):.2f}"
         )
         print(
-            "  Volume: "
-            f"mean={volume_avg/1e6:.2f}M±{volume_std/1e6:.2f}M, "
-            f"min={min(volume_vals)/1e6:.2f}M, max={max(volume_vals)/1e6:.2f}M"
+            "  거래량(백만 주): "
+            f"평균={volume_avg/1e6:.2f}M±{volume_std/1e6:.2f}M, "
+            f"최저={min(volume_vals)/1e6:.2f}M, 최고={max(volume_vals)/1e6:.2f}M"
         )
         print(
-            "  Return: "
-            f"mean={return_avg:.2f}%, std={return_std:.2f}%, "
-            f"min={min(returns):.2f}%, max={max(returns):.2f}%\n"
+            "  일간 수익률(%): "
+            f"평균={return_avg:.2f}%, 표준편차={return_std:.2f}%, "
+            f"최저={min(returns):.2f}%, 최고={max(returns):.2f}%\n"
         )
 
 
