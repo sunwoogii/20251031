@@ -1,0 +1,220 @@
+:root {
+  --bg: #0f172a;
+  --accent: #2563eb;
+  --accent-light: #60a5fa;
+  --text: #0f172a;
+  --text-muted: #475569;
+  --surface: #f8fafc;
+  --surface-alt: #ffffff;
+  --shadow: 0 18px 45px rgba(15, 23, 42, 0.15);
+  --max-width: 960px;
+  font-family: 'Pretendard', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  color: var(--text);
+  background-color: var(--surface);
+  line-height: 1.6;
+}
+
+.hero {
+  position: relative;
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.85), rgba(14, 165, 233, 0.85)), url('assets/efficient_frontier.svg');
+  background-size: cover;
+  color: #fff;
+  padding: 6rem 1.5rem 4rem;
+}
+
+.hero__overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+}
+
+.hero__content {
+  position: relative;
+  max-width: 720px;
+  z-index: 1;
+}
+
+.hero h1 {
+  font-size: clamp(2.2rem, 4vw, 3.5rem);
+  margin-bottom: 1rem;
+}
+
+.hero p {
+  font-size: clamp(1.05rem, 2.2vw, 1.4rem);
+  margin-bottom: 2rem;
+}
+
+.hero__cta {
+  display: inline-block;
+  padding: 0.85rem 1.8rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  background: var(--accent);
+  border-radius: 999px;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  box-shadow: 0 10px 25px rgba(37, 99, 235, 0.35);
+}
+
+.hero__cta:hover,
+.hero__cta:focus {
+  transform: translateY(-2px);
+  background: var(--accent-light);
+  box-shadow: 0 12px 32px rgba(37, 99, 235, 0.45);
+}
+
+main {
+  background: var(--surface);
+  margin-top: -4rem;
+  position: relative;
+  z-index: 2;
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
+  box-shadow: var(--shadow);
+}
+
+.section {
+  padding: 4rem 1.5rem;
+}
+
+.section--alt {
+  background: var(--surface-alt);
+}
+
+.section__content,
+.section > p,
+.section > ul,
+.section > div {
+  max-width: var(--max-width);
+  margin: 0 auto;
+}
+
+.section h2 {
+  font-size: clamp(1.8rem, 2.8vw, 2.4rem);
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.section p,
+.section li,
+.section .note {
+  font-size: 1rem;
+  color: var(--text-muted);
+}
+
+.section ul,
+.section ol {
+  margin: 0 auto 1.5rem;
+  padding-left: 1.2rem;
+  max-width: var(--max-width);
+}
+
+.section li + li {
+  margin-top: 0.5rem;
+}
+
+.button {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.75rem 1.5rem;
+  background: #fff;
+  border: 1px solid rgba(37, 99, 235, 0.2);
+  border-radius: 12px;
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+}
+
+.button:hover,
+.button:focus {
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 16px 32px rgba(37, 99, 235, 0.2);
+}
+
+.note {
+  border-left: 4px solid var(--accent);
+  padding: 1rem 1.2rem;
+  background: rgba(37, 99, 235, 0.08);
+  border-radius: 12px;
+}
+
+.chart {
+  max-width: var(--max-width);
+  margin: 2rem auto;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+  padding: 2rem;
+}
+
+.chart img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.highlight {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  background: rgba(37, 99, 235, 0.06);
+  border-radius: 18px;
+  padding: 1.5rem 2rem;
+  border: 1px solid rgba(37, 99, 235, 0.2);
+}
+
+.highlight h3 {
+  margin-top: 0;
+}
+
+.footer {
+  padding: 2rem 1.5rem 3rem;
+  text-align: center;
+  background: #0f172a;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.footer__links {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  font-size: 0.95rem;
+}
+
+.footer a {
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+}
+
+.footer a:hover,
+.footer a:focus {
+  text-decoration: underline;
+}
+
+@media (max-width: 720px) {
+  .section {
+    padding: 3rem 1.25rem;
+  }
+
+  .highlight,
+  .chart {
+    padding: 1.5rem;
+  }
+}
